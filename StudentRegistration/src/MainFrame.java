@@ -25,9 +25,14 @@ public class MainFrame extends JFrame {
     private DefaultTableModel model;
     JPanel editPanel;
     JPanel deletePanel;
-
+    JPanel ShowListpanel;
+ 	private JFrame MainFrame;
+ 	JMenuItem exitMenu;
+ 	JFrame ExitFrame;
     @SuppressWarnings("serial")
 	public MainFrame() {
+    	setIconImage(Toolkit.getDefaultToolkit().getImage(MainFrame.class.getResource("/assets/columbanlogo50x50.png")));
+    	setTitle("Student List");
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 1000, 700);
@@ -38,7 +43,13 @@ public class MainFrame extends JFrame {
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         setContentPane(contentPane);
         contentPane.setLayout(null);
-
+        
+        ShowListpanel = new JPanel();
+        ShowListpanel.setBackground(new Color(225, 225, 225));
+        ShowListpanel.setBounds(220, 89, 754, 562);
+        contentPane.add(ShowListpanel);
+        ShowListpanel.setLayout(null);
+        ShowListpanel.setVisible(false);
        
         JPanel headerPanel = new JPanel();
         headerPanel.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
@@ -54,7 +65,7 @@ public class MainFrame extends JFrame {
         headerPanel.add(lblNewLabel_1);
 
         
-        JLabel lblNewLabel_2 = new JLabel("Student Attendance ");
+        JLabel lblNewLabel_2 = new JLabel("Student List");
         lblNewLabel_2.setForeground(new Color(255, 255, 255));
         lblNewLabel_2.setFont(new Font("Tahoma", Font.BOLD, 16));
         lblNewLabel_2.setBounds(85, 19, 525, 28);
@@ -108,26 +119,30 @@ public class MainFrame extends JFrame {
         StudentAccountMenu.add(deleteMenu);
 
         
-        JMenuItem attedanceMenu = new JMenuItem("Attendance");
-        attedanceMenu.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                
-            }
-        });
-        mnNewMenu.add(attedanceMenu);
-
-        
         JMenuItem listMenu = new JMenuItem("Show Student List");
         listMenu.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        		
-        	}
+            public void actionPerformed(ActionEvent e) {
+                showStudentList();
+            }
         });
         mnNewMenu.add(listMenu);
-
         
         JMenuItem saveMenu = new JMenuItem("Save");
         mnNewMenu.add(saveMenu);
+        
+        JMenuItem exitMenu = new JMenuItem("Exit");
+    	exitMenu.addActionListener(new ActionListener() {
+    	    public void actionPerformed(ActionEvent e) {
+    	    	ExitFrame = new JFrame("Exit");
+    	    	if (JOptionPane.showConfirmDialog(ExitFrame, "Exit Program?","Student List",
+    	    			JOptionPane.YES_NO_OPTION)==JOptionPane.YES_NO_OPTION) {
+    	    		 System.exit(0);
+    	    	}
+    	       
+    	    }
+    	});
+    	mnNewMenu.add(exitMenu);
+     
 
         
         addAccPanel = new JPanel();
@@ -326,6 +341,7 @@ public class MainFrame extends JFrame {
     private void showAddAccountPanel() {
         editPanel.setVisible(false);
         deletePanel.setVisible(false);
+        ShowListpanel.setVisible(false);
         addAccPanel.setVisible(true);
         scrollPane.setBounds(73, 209, 633, 236);
         lblName.setBounds(73, 54, 95, 35);
@@ -351,6 +367,7 @@ public class MainFrame extends JFrame {
     private void showEditPanel() {
         addAccPanel.setVisible(false);
         deletePanel.setVisible(false);
+        ShowListpanel.setVisible(false);
         editPanel.setVisible(true);
 
         scrollPane.setBounds(10, 11, 734, 335);
@@ -377,9 +394,19 @@ public class MainFrame extends JFrame {
     private void showDeletePanel() {
         addAccPanel.setVisible(false);
         editPanel.setVisible(false);
+        ShowListpanel.setVisible(false);
         deletePanel.setVisible(true);
         scrollPane.setBounds(28, 34, 697, 400);
         deletePanel.add(scrollPane);
+    }
+    
+    private void showStudentList() {
+        scrollPane.setBounds(16, 44, 722, 462);
+        ShowListpanel.add(scrollPane);
+        addAccPanel.setVisible(false);
+        editPanel.setVisible(false);
+        deletePanel.setVisible(false);
+        ShowListpanel.setVisible(true);
     }
 
     public static void main(String[] args) {
