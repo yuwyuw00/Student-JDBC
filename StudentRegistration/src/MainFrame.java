@@ -61,18 +61,6 @@ public class MainFrame extends JFrame {
         ShowListpanel.add(SearchTXTFEILD);
         SearchTXTFEILD.setColumns(10);
 
-        JComboBox<String> comboBoxYear = new JComboBox<>();
-        comboBoxYear.setModel(new DefaultComboBoxModel<>(new String[] {"First Year", "Second Year", "Third Year", "Fourth Year", "Fifth Year"}));
-        comboBoxYear.setBounds(573, 7, 137, 22);
-        ShowListpanel.add(comboBoxYear);
-        comboBoxYear.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String selectedYear = comboBoxYear.getSelectedItem().toString();
-                searchAndUpdateTable(selectedYear, true); // Search and filter by selected year
-            }
-        });
-
         ShowListpanel.setVisible(false);
 
         JPanel headerPanel = new JPanel();
