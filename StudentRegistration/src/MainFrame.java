@@ -16,7 +16,7 @@ public class MainFrame extends JFrame {
     private static final String USERNAME = "root";
     private static final String PASSWORD = "1234";
     private static Connection connection;
-    
+
     private static final long serialVersionUID = 1L;
     private JPanel contentPane;
     private JTextField Name;
@@ -102,129 +102,127 @@ public class MainFrame extends JFrame {
         });
         addCancelbttn.setBounds(62, 473, 644, 30);
         addAccPanel.add(addCancelbttn);
-        
+
         JPanel menuPanel = new JPanel();
         menuPanel.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
         menuPanel.setBackground(new Color(0, 128, 192));
         menuPanel.setBounds(10, 89, 187, 562);
         contentPane.add(menuPanel);
         menuPanel.setLayout(null);
-            
+
         JMenuBar menuBar = new JMenuBar();
         menuBar.setBounds(0, 0, 200, 30);
         menuPanel.add(menuBar);
-                        
+
         JMenu mnNewMenu = new JMenu("");
         mnNewMenu.setIcon(new ImageIcon(MainFrame.class.getResource("/assets/icons8-hamburger-24.png")));
         menuBar.add(mnNewMenu);
-                                
+
         JMenu StudentAccountMenu = new JMenu("Student Account");
         mnNewMenu.add(StudentAccountMenu);
-        
+
         JMenuItem mntmNewMenuItem = new JMenuItem("Sample Item");
         StudentAccountMenu.add(mntmNewMenuItem);
-                                                                                
+
         JMenuItem addMenu = new JMenuItem("Add Student Account");
         mnNewMenu.add(addMenu);
         addMenu.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        		 addAccount();
-        	}
+            public void actionPerformed(ActionEvent e) {
+                addAccount();
+            }
         });
-                                                                                
+
         JMenuItem editMenu = new JMenuItem("Edit Student Account");
         mnNewMenu.add(editMenu);
         editMenu.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        		saveChanges();
-        	}
+            public void actionPerformed(ActionEvent e) {
+                saveChanges();
+            }
         });
-                                                                                
+
         JMenuItem deleteMenu = new JMenuItem("Delete Student Account");
         mnNewMenu.add(deleteMenu);
         deleteMenu.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        		deleteSelectedAccount();
-        	}
+            public void actionPerformed(ActionEvent e) {
+                deleteSelectedAccount();
+                
+            }
         });
-                                                                        
+
         JMenuItem saveMenu = new JMenuItem("Save");
         mnNewMenu.add(saveMenu);
-        
+
         JMenuItem exitMenu_1 = new JMenuItem("Exit");
         exitMenu_1.addActionListener(new ActionListener() {
-        	private JFrame ExitFrame;
-			public void actionPerformed(ActionEvent e) {
-				ExitFrame = new JFrame("Exit");
-				if (JOptionPane.showConfirmDialog(ExitFrame, "Exit Program?", "Student List",
-						JOptionPane.YES_NO_OPTION) == JOptionPane.YES_NO_OPTION) {
-					System.exit(0);
-				}
-			}
+            private JFrame ExitFrame;
+            public void actionPerformed(ActionEvent e) {
+                ExitFrame = new JFrame("Exit");
+                if (JOptionPane.showConfirmDialog(ExitFrame, "Exit Program?", "Student List",
+                        JOptionPane.YES_NO_OPTION) == JOptionPane.YES_NO_OPTION) {
+                    System.exit(0);
+                }
+            }
         });
         mnNewMenu.add(exitMenu_1);
-        
+
         JCheckBoxMenuItem chckbxmntmNewCheckItem = new JCheckBoxMenuItem("Sample Check Box");
         chckbxmntmNewCheckItem.setHorizontalAlignment(SwingConstants.LEFT);
         menuBar.add(chckbxmntmNewCheckItem);
-        
+
         JRadioButtonMenuItem rdbtnmntmNewRadioItem = new JRadioButtonMenuItem("Sample Radio Button");
         rdbtnmntmNewRadioItem.setHorizontalAlignment(SwingConstants.LEFT);
         menuBar.add(rdbtnmntmNewRadioItem);
-        
-        	initializeComponents();
-        	connectToDatabase();
-    }	
-    
-    	private void initializeComponents() {
-    		lblName = new JLabel("Student's Name");
-    		
-	        lblCourseYear = new JLabel("Course & Year");
-	
-	        lblIdNumber = new JLabel("ID Number");
-	
-	        Name = new JTextField();
-	        Name.setColumns(10);
-	        
-	        Course = new JTextField();
-	        Course.setColumns(10);
-	        
-	        id = new JTextField();
-	        id.setColumns(10);
-	        
-	
-	        Year = new JComboBox<>();
-	       
-	        Year.setModel(new DefaultComboBoxModel<>(new String[] {"First Year", "Second Year", "Third Year", "Fourth Year", "Fifth Year"}));
-	        addAccPanel.add(Year);
-	        model = (DefaultTableModel) table.getModel();
-	        
-	       
-	        lblName.setBounds(73, 21, 95, 35);
-	        addAccPanel.add(lblName);
-	        lblCourseYear.setBounds(73, 113, 95, 35);
-	        addAccPanel.add(lblCourseYear);
-	        lblIdNumber.setBounds(73, 67, 95, 35);
-	        addAccPanel.add(lblIdNumber);
-	        Name.setBounds(169, 21, 537, 35);
-	        addAccPanel.add(Name);
-	        Course.setBounds(169, 113, 333, 35);
-	        addAccPanel.add(Course);
-	        id.setBounds(169, 67, 537, 35);
-	        addAccPanel.add(id);
-	        Year.setBounds(513, 113, 193, 34);
-	        addAccPanel.add(Year);
-	        addAccPanel.add(scrollPane);
-	        
-	        JLabel lblNewLabel = new JLabel("**Please Select a Row to EDIT or DELETE a Student Account");
-	        lblNewLabel.setForeground(new Color(255, 45, 45));
-	        lblNewLabel.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 11));
-	        lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
-	        lblNewLabel.setBounds(83, 149, 364, 22);
-	        addAccPanel.add(lblNewLabel);
 
+        initializeComponents();
+        connectToDatabase();
+        updateTable();
     }
-    	
+
+    private void initializeComponents() {
+        lblName = new JLabel("Student's Name");
+
+        lblCourseYear = new JLabel("Course & Year");
+
+        lblIdNumber = new JLabel("ID Number");
+
+        Name = new JTextField();
+        Name.setColumns(10);
+
+        Course = new JTextField();
+        Course.setColumns(10);
+
+        id = new JTextField();
+        id.setColumns(10);
+
+        Year = new JComboBox<>();
+
+        Year.setModel(new DefaultComboBoxModel<>(new String[] {"First Year", "Second Year", "Third Year", "Fourth Year", "Fifth Year"}));
+
+        lblName.setBounds(73, 21, 95, 35);
+        addAccPanel.add(lblName);
+        lblCourseYear.setBounds(73, 113, 95, 35);
+        addAccPanel.add(lblCourseYear);
+        lblIdNumber.setBounds(73, 67, 95, 35);
+        addAccPanel.add(lblIdNumber);
+        Name.setBounds(169, 21, 537, 35);
+        addAccPanel.add(Name);
+        Course.setBounds(169, 113, 333, 35);
+        addAccPanel.add(Course);
+        id.setBounds(169, 67, 537, 35);
+        addAccPanel.add(id);
+        Year.setBounds(513, 113, 193, 34);
+        addAccPanel.add(Year);
+        addAccPanel.add(scrollPane);
+
+        JLabel lblNewLabel = new JLabel("**Please Select a Row to EDIT or DELETE a Student Account");
+        lblNewLabel.setForeground(new Color(255, 45, 45));
+        lblNewLabel.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 11));
+        lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        lblNewLabel.setBounds(83, 149, 364, 22);
+        addAccPanel.add(lblNewLabel);
+        updateTable();
+    }
+
     private void searchAndUpdateTable(String searchText, boolean searchByYear) {
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
         TableRowSorter<DefaultTableModel> tableRowSorter = new TableRowSorter<>(tableModel);
@@ -258,6 +256,8 @@ public class MainFrame extends JFrame {
 
             JOptionPane.showMessageDialog(null, "Student Account is Succesfully Added.");
 
+            insertStudent(Name.getText(), id.getText(), Course.getText(), (String) Year.getSelectedItem());
+
             clearInputFields();
         }
     }
@@ -271,6 +271,10 @@ public class MainFrame extends JFrame {
             model.setValueAt(Year.getSelectedItem(), selectedRow, 3);
 
             JOptionPane.showMessageDialog(null, "Changes Saved Successfully.");
+
+            // Update the corresponding row in the database
+     
+
         } else {
             JOptionPane.showMessageDialog(null, "Please Select a Row to Edit.");
         }
@@ -281,6 +285,10 @@ public class MainFrame extends JFrame {
         if (selectedRow >= 0) {
             model.removeRow(selectedRow);
             JOptionPane.showMessageDialog(null, "Student Account is Successfully Deleted.");
+
+            // Delete the corresponding record from the database
+            deleteStudent((String) model.getValueAt(selectedRow, 0));
+
         } else {
             JOptionPane.showMessageDialog(null, "Please Select a Row to Delete.");
         }
@@ -292,7 +300,7 @@ public class MainFrame extends JFrame {
         Course.setText("");
         Year.setSelectedItem("First Year");
     }
-    
+
     private void connectToDatabase() {
         try {
             connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
@@ -358,5 +366,17 @@ public class MainFrame extends JFrame {
             e.printStackTrace();
         }
     }
-   
+
+    public static void main(String[] args) {
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    MainFrame frame = new MainFrame();
+                    frame.setVisible(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
 }
