@@ -70,7 +70,7 @@ public class MainFrame extends JFrame {
         menuPanel.setLayout(null);
 //MENU COMPONENTS AND INITIALIZATIONS vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
         JMenuBar menuBar = new JMenuBar();
-        menuBar.setBounds(0, 0, 200, 30);
+        menuBar.setBounds(0, 0, 187, 30);
         menuPanel.add(menuBar);
 
         JMenu mnNewMenu = new JMenu("");
@@ -210,7 +210,7 @@ public class MainFrame extends JFrame {
         lblNewLabel.setForeground(new Color(255, 45, 45));
         lblNewLabel.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 11));
         lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        lblNewLabel.setBounds(83, 149, 364, 22);
+        lblNewLabel.setBounds(42, 159, 364, 22);
         addAccPanel.add(lblNewLabel);
     }
 
@@ -258,17 +258,19 @@ public class MainFrame extends JFrame {
     private void saveChanges() {
         int selectedRow = table.getSelectedRow();
         if (selectedRow >= 0) {
+            String studentID = (String) model.getValueAt(selectedRow, 0);
             model.setValueAt(id.getText(), selectedRow, 0);
             model.setValueAt(Name.getText(), selectedRow, 1);
             model.setValueAt(Course.getText(), selectedRow, 2);
             model.setValueAt(Year.getSelectedItem(), selectedRow, 3);
+
+            updateStudent(studentID, Name.getText(), id.getText(), Course.getText(), (String) Year.getSelectedItem());
 
             JOptionPane.showMessageDialog(null, "Changes Saved Successfully.");
         } else {
             JOptionPane.showMessageDialog(null, "Please Select a Row to Edit.");
         }
     }
-
     private void deleteSelectedAccount() {
         int selectedRow = table.getSelectedRow();
         if (selectedRow >= 0) {
@@ -342,7 +344,7 @@ public class MainFrame extends JFrame {
     }
 
     private void updateTable() {
-        model.setRowCount(0); // Clear the existing table data
+        model.setRowCount(0);
         try {
             String query = "SELECT * FROM connector";
             try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -357,6 +359,23 @@ public class MainFrame extends JFrame {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+    
+    private void updateStudent(String studentID, String name, String id, String course, String year) {
+        try {
+            String query = "UPDATE connector SET Name=?, StudentID=?, Course=?, Year=? WHERE StudentID=?";
+            try (PreparedStatement statement = connection.prepareStatement(query)) {
+                statement.setString(1, name);
+                statement.setString(2, id);
+                statement.setString(3, course);
+                statement.setString(4, year);
+                statement.setString(5, studentID);
+                statement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Failed to update student record.");
         }
     }
 
