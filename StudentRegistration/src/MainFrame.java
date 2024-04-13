@@ -5,25 +5,31 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class MainFrame extends JFrame {
-
+    private static final String URL = "jdbc:mysql://localhost:3306/connector";
+    private static final String USERNAME = "root";
+    private static final String PASSWORD = "1234";
+    private static Connection connection;
+    
     private static final long serialVersionUID = 1L;
     private JPanel contentPane;
-    private JTextField name;
-    private JTextField course;
+    private JTextField Name;
+    private JTextField Course;
     private JTextField id;
     private JTable table;
     private JPanel addAccPanel;
-    private JComboBox year;
+    private JComboBox Year;
     private JScrollPane scrollPane;
     private JLabel lblName;
     private JLabel lblCourseYear;
     private JLabel lblIdNumber;
     private DefaultTableModel model;
-    private JPanel editPanel;
-    private JPanel deletePanel;
-    private JPanel ShowListpanel;
     private JMenuItem exitMenu;
 
     public MainFrame() {
@@ -38,30 +44,6 @@ public class MainFrame extends JFrame {
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         setContentPane(contentPane);
         contentPane.setLayout(null);
-
-        ShowListpanel = new JPanel();
-        ShowListpanel.setBackground(new Color(225, 225, 225));
-        ShowListpanel.setBounds(220, 89, 754, 562);
-        contentPane.add(ShowListpanel);
-        ShowListpanel.setLayout(null);
-
-        JLabel lblSearch = new JLabel("Search:");
-        lblSearch.setBounds(10, 11, 46, 14);
-        ShowListpanel.add(lblSearch);
-
-        JTextField SearchTXTFEILD = new JTextField();
-        SearchTXTFEILD.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                String searchText = SearchTXTFEILD.getText().trim();
-                searchAndUpdateTable(searchText, false); // Search without filtering by year
-            }
-        });
-        SearchTXTFEILD.setBounds(57, 8, 506, 20);
-        ShowListpanel.add(SearchTXTFEILD);
-        SearchTXTFEILD.setColumns(10);
-
-        ShowListpanel.setVisible(false);
 
         JPanel headerPanel = new JPanel();
         headerPanel.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
@@ -81,91 +63,16 @@ public class MainFrame extends JFrame {
         lblNewLabel_2.setBounds(85, 19, 525, 28);
         headerPanel.add(lblNewLabel_2);
 
-        JPanel menuPanel = new JPanel();
-        menuPanel.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
-        menuPanel.setBackground(new Color(0, 128, 192));
-        menuPanel.setBounds(10, 89, 200, 562);
-        contentPane.add(menuPanel);
-        menuPanel.setLayout(null);
-
-        JMenuBar menuBar = new JMenuBar();
-        menuBar.setBounds(0, 0, 200, 30);
-        menuPanel.add(menuBar);
-
-        JMenu mnNewMenu = new JMenu("");
-        mnNewMenu.setIcon(new ImageIcon(MainFrame.class.getResource("/assets/icons8-hamburger-24.png")));
-        menuBar.add(mnNewMenu);
-
-        JMenu StudentAccountMenu = new JMenu("Student Account");
-        mnNewMenu.add(StudentAccountMenu);
-
-        JMenuItem addMenu = new JMenuItem("Add Student Account");
-        addMenu.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                showAddAccountPanel();
-            }
-        });
-        StudentAccountMenu.add(addMenu);
-
-        JMenuItem editMenu = new JMenuItem("Edit Student Account");
-        editMenu.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                showEditPanel();
-            }
-        });
-        StudentAccountMenu.add(editMenu);
-
-        JMenuItem deleteMenu = new JMenuItem("Delete Student Account");
-        deleteMenu.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                showDeletePanel();
-            }
-        });
-        StudentAccountMenu.add(deleteMenu);
-
-        JMenuItem listMenu = new JMenuItem("Show Student List");
-        listMenu.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                showStudentList();
-            }
-        });
-        mnNewMenu.add(listMenu);
-
-        JMenuItem saveMenu = new JMenuItem("Save");
-        mnNewMenu.add(saveMenu);
-
-        JMenuItem exitMenu = new JMenuItem("Exit");
-        exitMenu.addActionListener(new ActionListener() {
-            private JFrame ExitFrame;
-			public void actionPerformed(ActionEvent e) {
-                ExitFrame = new JFrame("Exit");
-                if (JOptionPane.showConfirmDialog(ExitFrame, "Exit Program?", "Student List",
-                        JOptionPane.YES_NO_OPTION) == JOptionPane.YES_NO_OPTION) {
-                    System.exit(0);
-                }
-            }
-        });
-        mnNewMenu.add(exitMenu);
-
         addAccPanel = new JPanel();
         addAccPanel.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(91, 91, 91)));
         addAccPanel.setBackground(new Color(225, 225, 225));
-        addAccPanel.setBounds(220, 89, 754, 562);
+        addAccPanel.setBounds(207, 89, 767, 562);
         contentPane.add(addAccPanel);
         addAccPanel.setLayout(null);
-        addAccPanel.setVisible(false);
-
-        JButton addAccountbttn = new JButton("Add Account");
-        addAccountbttn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                addAccount();
-            }
-        });
-        addAccountbttn.setBounds(581, 56, 125, 30);
-        addAccPanel.add(addAccountbttn);
+        addAccPanel.setVisible(true);
 
         scrollPane = new JScrollPane();
-        scrollPane.setBounds(73, 209, 633, 236);
+        scrollPane.setBounds(62, 182, 644, 280);
         addAccPanel.add(scrollPane);
 
         table = new JTable();
@@ -193,80 +100,131 @@ public class MainFrame extends JFrame {
                 clearInputFields();
             }
         });
-        addCancelbttn.setBounds(581, 97, 125, 30);
+        addCancelbttn.setBounds(62, 473, 644, 30);
         addAccPanel.add(addCancelbttn);
-
-        editPanel = new JPanel();
-        editPanel.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
-        editPanel.setBackground(new Color(225, 225, 225));
-        editPanel.setBounds(220, 89, 754, 562);
-        contentPane.add(editPanel);
-        editPanel.setVisible(false);
-        editPanel.setLayout(null);
-
-        JButton SaveChanges = new JButton("Save Changes");
-        SaveChanges.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                saveChanges();
-            }
+        
+        JPanel menuPanel = new JPanel();
+        menuPanel.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
+        menuPanel.setBackground(new Color(0, 128, 192));
+        menuPanel.setBounds(10, 89, 187, 562);
+        contentPane.add(menuPanel);
+        menuPanel.setLayout(null);
+            
+        JMenuBar menuBar = new JMenuBar();
+        menuBar.setBounds(0, 0, 200, 30);
+        menuPanel.add(menuBar);
+                        
+        JMenu mnNewMenu = new JMenu("");
+        mnNewMenu.setIcon(new ImageIcon(MainFrame.class.getResource("/assets/icons8-hamburger-24.png")));
+        menuBar.add(mnNewMenu);
+                                
+        JMenu StudentAccountMenu = new JMenu("Student Account");
+        mnNewMenu.add(StudentAccountMenu);
+        
+        JMenuItem mntmNewMenuItem = new JMenuItem("Sample Item");
+        StudentAccountMenu.add(mntmNewMenuItem);
+                                                                                
+        JMenuItem addMenu = new JMenuItem("Add Student Account");
+        mnNewMenu.add(addMenu);
+        addMenu.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		 addAccount();
+        	}
         });
-        SaveChanges.setBounds(532, 354, 194, 41);
-        editPanel.add(SaveChanges);
-
-        JButton Cancel = new JButton("Cancel");
-        Cancel.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                clearInputFields();
-            }
+                                                                                
+        JMenuItem editMenu = new JMenuItem("Edit Student Account");
+        mnNewMenu.add(editMenu);
+        editMenu.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		saveChanges();
+        	}
         });
-        Cancel.setBounds(532, 402, 194, 41);
-        editPanel.add(Cancel);
-
-        deletePanel = new JPanel();
-        deletePanel.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
-        deletePanel.setBackground(new Color(225, 225, 225));
-        deletePanel.setBounds(220, 89, 754, 562);
-        contentPane.add(deletePanel);
-        deletePanel.setLayout(null);
-        deletePanel.setVisible(false);
-
-        JButton btnNewButton = new JButton("Delete Student Account");
-        btnNewButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                deleteSelectedAccount();
-            }
+                                                                                
+        JMenuItem deleteMenu = new JMenuItem("Delete Student Account");
+        mnNewMenu.add(deleteMenu);
+        deleteMenu.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		deleteSelectedAccount();
+        	}
         });
-        btnNewButton.setBounds(490, 473, 222, 37);
-        deletePanel.add(btnNewButton);
+                                                                        
+        JMenuItem saveMenu = new JMenuItem("Save");
+        mnNewMenu.add(saveMenu);
+        
+        JMenuItem exitMenu_1 = new JMenuItem("Exit");
+        exitMenu_1.addActionListener(new ActionListener() {
+        	private JFrame ExitFrame;
+			public void actionPerformed(ActionEvent e) {
+				ExitFrame = new JFrame("Exit");
+				if (JOptionPane.showConfirmDialog(ExitFrame, "Exit Program?", "Student List",
+						JOptionPane.YES_NO_OPTION) == JOptionPane.YES_NO_OPTION) {
+					System.exit(0);
+				}
+			}
+        });
+        mnNewMenu.add(exitMenu_1);
+        
+        JCheckBoxMenuItem chckbxmntmNewCheckItem = new JCheckBoxMenuItem("Sample Check Box");
+        chckbxmntmNewCheckItem.setHorizontalAlignment(SwingConstants.LEFT);
+        menuBar.add(chckbxmntmNewCheckItem);
+        
+        JRadioButtonMenuItem rdbtnmntmNewRadioItem = new JRadioButtonMenuItem("Sample Radio Button");
+        rdbtnmntmNewRadioItem.setHorizontalAlignment(SwingConstants.LEFT);
+        menuBar.add(rdbtnmntmNewRadioItem);
+        
+        	initializeComponents();
+        	connectToDatabase();
+    }	
+    
+    	private void initializeComponents() {
+    		lblName = new JLabel("Student's Name");
+    		
+	        lblCourseYear = new JLabel("Course & Year");
+	
+	        lblIdNumber = new JLabel("ID Number");
+	
+	        Name = new JTextField();
+	        Name.setColumns(10);
+	        
+	        Course = new JTextField();
+	        Course.setColumns(10);
+	        
+	        id = new JTextField();
+	        id.setColumns(10);
+	        
+	
+	        Year = new JComboBox<>();
+	       
+	        Year.setModel(new DefaultComboBoxModel<>(new String[] {"First Year", "Second Year", "Third Year", "Fourth Year", "Fifth Year"}));
+	        addAccPanel.add(Year);
+	        model = (DefaultTableModel) table.getModel();
+	        
+	       
+	        lblName.setBounds(73, 21, 95, 35);
+	        addAccPanel.add(lblName);
+	        lblCourseYear.setBounds(73, 113, 95, 35);
+	        addAccPanel.add(lblCourseYear);
+	        lblIdNumber.setBounds(73, 67, 95, 35);
+	        addAccPanel.add(lblIdNumber);
+	        Name.setBounds(169, 21, 537, 35);
+	        addAccPanel.add(Name);
+	        Course.setBounds(169, 113, 333, 35);
+	        addAccPanel.add(Course);
+	        id.setBounds(169, 67, 537, 35);
+	        addAccPanel.add(id);
+	        Year.setBounds(513, 113, 193, 34);
+	        addAccPanel.add(Year);
+	        addAccPanel.add(scrollPane);
+	        
+	        JLabel lblNewLabel = new JLabel("**Please Select a Row to EDIT or DELETE a Student Account");
+	        lblNewLabel.setForeground(new Color(255, 45, 45));
+	        lblNewLabel.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 11));
+	        lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
+	        lblNewLabel.setBounds(83, 149, 364, 22);
+	        addAccPanel.add(lblNewLabel);
 
-        JLabel lblNewLabel = new JLabel("Select a Row ");
-        lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 13));
-        lblNewLabel.setBounds(10, 11, 129, 14);
-        deletePanel.add(lblNewLabel);
-
-        initializeComponents();
     }
-
-    private void initializeComponents() {
-        lblName = new JLabel("Student's Name");
-        lblCourseYear = new JLabel("Course & Year");
-        lblIdNumber = new JLabel("ID Number");
-
-        name = new JTextField();
-        name.setColumns(10);
-
-        course = new JTextField();
-        course.setColumns(10);
-
-        id = new JTextField();
-        id.setColumns(10);
-
-        year = new JComboBox<>();
-        year.setModel(new DefaultComboBoxModel<>(new String[] {"First Year", "Second Year", "Third Year", "Fourth Year", "Fifth Year"}));
-
-        model = (DefaultTableModel) table.getModel();
-    }
-
+    	
     private void searchAndUpdateTable(String searchText, boolean searchByYear) {
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
         TableRowSorter<DefaultTableModel> tableRowSorter = new TableRowSorter<>(tableModel);
@@ -282,20 +240,20 @@ public class MainFrame extends JFrame {
     private void displaySelectedRowData() {
         int selectedValue = table.getSelectedRow();
         id.setText((String) model.getValueAt(selectedValue, 0));
-        name.setText((String) model.getValueAt(selectedValue, 1));
-        course.setText((String) model.getValueAt(selectedValue, 2));
-        year.setSelectedItem((String) model.getValueAt(selectedValue, 3));
+        Name.setText((String) model.getValueAt(selectedValue, 1));
+        Course.setText((String) model.getValueAt(selectedValue, 2));
+        Year.setSelectedItem((String) model.getValueAt(selectedValue, 3));
     }
 
     private void addAccount() {
-        if (name.getText().equals("") || id.getText().equals("") || course.getText().equals("")) {
+        if (Name.getText().equals("") || id.getText().equals("") || Course.getText().equals("")) {
             JOptionPane.showMessageDialog(null, "Please Insert Complete Information!");
         } else {
             model.addRow(new Object[]{
                     id.getText(),
-                    name.getText(),
-                    course.getText(),
-                    year.getSelectedItem()
+                    Name.getText(),
+                    Course.getText(),
+                    Year.getSelectedItem()
             });
 
             JOptionPane.showMessageDialog(null, "Student Account is Succesfully Added.");
@@ -308,9 +266,9 @@ public class MainFrame extends JFrame {
         int selectedRow = table.getSelectedRow();
         if (selectedRow >= 0) {
             model.setValueAt(id.getText(), selectedRow, 0);
-            model.setValueAt(name.getText(), selectedRow, 1);
-            model.setValueAt(course.getText(), selectedRow, 2);
-            model.setValueAt(year.getSelectedItem(), selectedRow, 3);
+            model.setValueAt(Name.getText(), selectedRow, 1);
+            model.setValueAt(Course.getText(), selectedRow, 2);
+            model.setValueAt(Year.getSelectedItem(), selectedRow, 3);
 
             JOptionPane.showMessageDialog(null, "Changes Saved Successfully.");
         } else {
@@ -329,107 +287,76 @@ public class MainFrame extends JFrame {
     }
 
     private void clearInputFields() {
-        name.setText("");
+        Name.setText("");
         id.setText("");
-        course.setText("");
-        year.setSelectedItem("First Year");
+        Course.setText("");
+        Year.setSelectedItem("First Year");
+    }
+    
+    private void connectToDatabase() {
+        try {
+            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+            System.out.println("Connected to the database.");
+        } catch (SQLException e) {
+            System.err.println("Error connecting to the database: " + e.getMessage());
+            e.printStackTrace(); // Print the stack trace for more details
+        }
     }
 
-    private void showAddAccountPanel() {
-        editPanel.setVisible(false);
-        deletePanel.setVisible(false);
-        ShowListpanel.setVisible(false);
-        addAccPanel.setVisible(true);
-        scrollPane.setBounds(73, 209, 633, 236);
-        lblName.setBounds(73, 54, 95, 35);
-        addAccPanel.add(lblName);
-        lblCourseYear.setBounds(73, 146, 95, 35);
-        addAccPanel.add(lblCourseYear);
-        lblIdNumber.setBounds(73, 100, 95, 35);
-        addAccPanel.add(lblIdNumber);
-        name.setBounds(169, 54, 360, 35);
-        addAccPanel.add(name);
-        course.setBounds(169, 146, 255, 35);
-        addAccPanel.add(course);
-        id.setBounds(169, 100, 360, 35);
-        addAccPanel.add(id);
-        year.setBounds(434, 146, 95, 34);
-        addAccPanel.add(year);
-        addAccPanel.add(scrollPane);
-
-        clearInputFields();
+    private void addStudent(String name, String id, String course, String year) {
+        model.addRow(new Object[]{id, name, course, year});
     }
 
-    private void showEditPanel() {
-        addAccPanel.setVisible(false);
-        deletePanel.setVisible(false);
-        ShowListpanel.setVisible(false);
-        editPanel.setVisible(true);
+    private void insertStudent(String name, String id, String course, String year) {
+        try {
+            String query = "INSERT INTO your_table_name (Name, ID, Course, Year) VALUES (?, ?, ?, ?)";
+            try (PreparedStatement statement = connection.prepareStatement(query)) {
+                statement.setString(1, name);
+                statement.setString(2, id);
+                statement.setString(3, course);
+                statement.setString(4, year);
+                statement.executeUpdate();
+            }
 
-        scrollPane.setBounds(10, 11, 734, 335);
-        editPanel.add(scrollPane);
-        lblName.setBounds(20, 357, 95, 35);
-        editPanel.add(lblName);
-        lblCourseYear.setBounds(20, 449, 95, 35);
-        editPanel.add(lblCourseYear);
-        lblIdNumber.setBounds(20, 403, 95, 35);
-        editPanel.add(lblIdNumber);
-        name.setBounds(116, 357, 360, 35);
-        editPanel.add(name);
-        course.setBounds(116, 449, 255, 35);
-        editPanel.add(course);
-        id.setBounds(116, 403, 360, 35);
-        editPanel.add(id);
-        year.setBounds(381, 449, 95, 34);
-        editPanel.add(year);
+            // Refresh the table after insertion
+            updateTable();
 
-        clearInputFields();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Failed to insert student record.");
+        }
     }
 
-    private void showDeletePanel() {
-        addAccPanel.setVisible(false);
-        editPanel.setVisible(false);
-        ShowListpanel.setVisible(false);
-        deletePanel.setVisible(true);
-        scrollPane.setBounds(28, 34, 697, 400);
-        deletePanel.add(scrollPane);
+    private void deleteStudent(String id) {
+        try {
+            String query = "DELETE FROM your_table_name WHERE ID=?";
+            try (PreparedStatement statement = connection.prepareStatement(query)) {
+                statement.setString(1, id);
+                statement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Failed to delete student record.");
+        }
     }
 
-    private void showStudentList() {
-        scrollPane.setBounds(16, 180, 700, 350);
-
-        addAccPanel.setVisible(false);
-        editPanel.setVisible(false);
-        deletePanel.setVisible(false);
-        ShowListpanel.setVisible(true);
-        lblName.setBounds(73, 44, 95, 35);
-        ShowListpanel.add(lblName);
-        lblCourseYear.setBounds(73, 136, 95, 35);
-        ShowListpanel.add(lblCourseYear);
-        lblIdNumber.setBounds(73, 90, 95, 35);
-        ShowListpanel.add(lblIdNumber);
-        name.setBounds(169, 44, 400, 35);
-        ShowListpanel.add(name);
-        course.setBounds(169, 136, 285, 35);
-        ShowListpanel.add(course);
-        id.setBounds(169, 90, 400, 35);
-        ShowListpanel.add(id);
-        year.setBounds(464, 136, 125, 34);
-        ShowListpanel.add(year);
-        ShowListpanel.add(scrollPane);
-        clearInputFields();
-    }
-
-    public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    MainFrame frame = new MainFrame();
-                    frame.setVisible(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
+    private void updateTable() {
+        model.setRowCount(0); // Clear the existing table data
+        try {
+            String query = "SELECT * FROM your_table_name";
+            try (PreparedStatement statement = connection.prepareStatement(query)) {
+                ResultSet resultSet = statement.executeQuery(); // Execute the prepared statement
+                while (resultSet.next()) {
+                    String id = resultSet.getString("ID");
+                    String name = resultSet.getString("Name");
+                    String course = resultSet.getString("Course");
+                    String year = resultSet.getString("Year");
+                    model.addRow(new Object[]{id, name, course, year});
                 }
             }
-        });
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
+   
 }
