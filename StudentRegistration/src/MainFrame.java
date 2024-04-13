@@ -108,10 +108,7 @@ public class MainFrame extends JFrame {
             }
         });
 
-        JMenuItem saveMenu = new JMenuItem("Save");
-        mnNewMenu.add(saveMenu);
-
-        JMenuItem exitMenu_1 = new JMenuItem("Exit");
+        JMenuItem exitMenu_1 = new JMenuItem("Exit and Save");
         exitMenu_1.addActionListener(new ActionListener() {
             private JFrame ExitFrame;
             public void actionPerformed(ActionEvent e) {
