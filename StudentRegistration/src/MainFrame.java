@@ -2,7 +2,6 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.Connection;
@@ -30,8 +29,8 @@ public class MainFrame extends JFrame {
     private JLabel lblCourseYear;
     private JLabel lblIdNumber;
     private DefaultTableModel model;
-    private JMenuItem exitMenu;
 
+    @SuppressWarnings("serial")
     public MainFrame() {
         setIconImage(Toolkit.getDefaultToolkit().getImage(MainFrame.class.getResource("/assets/columbanlogo50x50.png")));
         setTitle("Student List");
@@ -63,53 +62,13 @@ public class MainFrame extends JFrame {
         lblNewLabel_2.setBounds(85, 19, 525, 28);
         headerPanel.add(lblNewLabel_2);
 
-        addAccPanel = new JPanel();
-        addAccPanel.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(91, 91, 91)));
-        addAccPanel.setBackground(new Color(225, 225, 225));
-        addAccPanel.setBounds(207, 89, 767, 562);
-        contentPane.add(addAccPanel);
-        addAccPanel.setLayout(null);
-        addAccPanel.setVisible(true);
-
-        scrollPane = new JScrollPane();
-        scrollPane.setBounds(62, 182, 644, 280);
-        addAccPanel.add(scrollPane);
-
-        table = new JTable();
-        table.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                displaySelectedRowData();
-            }
-        });
-        table.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
-        table.setModel(new DefaultTableModel(
-                new Object[][] {},
-                new String[] { "ID Number", "Student Name", "Course", "Year" }
-        ) {
-            boolean[] columnEditables = new boolean[] { false, false, false, false };
-            public boolean isCellEditable(int row, int column) {
-                return columnEditables[column];
-            }
-        });
-        scrollPane.setViewportView(table);
-
-        JButton addCancelbttn = new JButton("Cancel");
-        addCancelbttn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                clearInputFields();
-            }
-        });
-        addCancelbttn.setBounds(62, 473, 644, 30);
-        addAccPanel.add(addCancelbttn);
-
-        JPanel menuPanel = new JPanel();
+        JPanel menuPanel = new JPanel(); // Create menuPanel
         menuPanel.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
         menuPanel.setBackground(new Color(0, 128, 192));
         menuPanel.setBounds(10, 89, 187, 562);
         contentPane.add(menuPanel);
         menuPanel.setLayout(null);
-
+//MENU COMPONENTS AND INITIALIZATIONS vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
         JMenuBar menuBar = new JMenuBar();
         menuBar.setBounds(0, 0, 200, 30);
         menuPanel.add(menuBar);
@@ -164,40 +123,76 @@ public class MainFrame extends JFrame {
             }
         });
         mnNewMenu.add(exitMenu_1);
+        
 
         JCheckBoxMenuItem chckbxmntmNewCheckItem = new JCheckBoxMenuItem("Sample Check Box");
         chckbxmntmNewCheckItem.setHorizontalAlignment(SwingConstants.LEFT);
         menuBar.add(chckbxmntmNewCheckItem);
+        
 
         JRadioButtonMenuItem rdbtnmntmNewRadioItem = new JRadioButtonMenuItem("Sample Radio Button");
         rdbtnmntmNewRadioItem.setHorizontalAlignment(SwingConstants.LEFT);
         menuBar.add(rdbtnmntmNewRadioItem);
+//MENU COMPONENTS AND INITIALIZATIONS^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        
+        addAccPanel = new JPanel();
+        addAccPanel.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(91, 91, 91)));
+        addAccPanel.setBackground(new Color(225, 225, 225));
+        addAccPanel.setBounds(207, 89, 767, 562);
+        contentPane.add(addAccPanel);
+        addAccPanel.setLayout(null);
+        addAccPanel.setVisible(true);
 
-        initializeComponents();
+        scrollPane = new JScrollPane();
+        scrollPane.setBounds(62, 182, 644, 280);
+        addAccPanel.add(scrollPane);
+        //TABLE COMPONENTSvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv       
+        model = new DefaultTableModel(
+                new Object[][] {},
+                new String[] { "StudentID", "Name", "Course", "Year" }
+            ) {
+                boolean[] columnEditables = new boolean[] { false, false, false, false };
+                public boolean isCellEditable(int row, int column) {
+                    return columnEditables[column];
+                }
+            };
+
+        table = new JTable(model);
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                displaySelectedRowData();
+            }
+        });
+        scrollPane.setViewportView(table);
+      //TABLE COMPONENTS^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        JButton addCancelbttn = new JButton("Cancel");
+        addCancelbttn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                clearInputFields();
+            }
+        });
+        addCancelbttn.setBounds(62, 473, 644, 30);
+        addAccPanel.add(addCancelbttn);
+
+        initializeComponents(); 
         connectToDatabase();
         updateTable();
     }
 
-    private void initializeComponents() {
+
+    private void initializeComponents() {//INITIALIZATION OF THE COMPONETS
         lblName = new JLabel("Student's Name");
-
         lblCourseYear = new JLabel("Course & Year");
-
-        lblIdNumber = new JLabel("ID Number");
-
+        lblIdNumber = new JLabel("StudentID Number");
         Name = new JTextField();
         Name.setColumns(10);
-
         Course = new JTextField();
         Course.setColumns(10);
-
         id = new JTextField();
         id.setColumns(10);
-
         Year = new JComboBox<>();
-
         Year.setModel(new DefaultComboBoxModel<>(new String[] {"First Year", "Second Year", "Third Year", "Fourth Year", "Fifth Year"}));
-
         lblName.setBounds(73, 21, 95, 35);
         addAccPanel.add(lblName);
         lblCourseYear.setBounds(73, 113, 95, 35);
@@ -212,7 +207,6 @@ public class MainFrame extends JFrame {
         addAccPanel.add(id);
         Year.setBounds(513, 113, 193, 34);
         addAccPanel.add(Year);
-        addAccPanel.add(scrollPane);
 
         JLabel lblNewLabel = new JLabel("**Please Select a Row to EDIT or DELETE a Student Account");
         lblNewLabel.setForeground(new Color(255, 45, 45));
@@ -220,22 +214,9 @@ public class MainFrame extends JFrame {
         lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
         lblNewLabel.setBounds(83, 149, 364, 22);
         addAccPanel.add(lblNewLabel);
-        updateTable();
     }
 
-    private void searchAndUpdateTable(String searchText, boolean searchByYear) {
-        DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
-        TableRowSorter<DefaultTableModel> tableRowSorter = new TableRowSorter<>(tableModel);
-        table.setRowSorter(tableRowSorter);
-        if (searchByYear) {
-            tableRowSorter.setRowFilter(RowFilter.regexFilter("(?i)" + searchText, 3));
-        } else {
-            tableRowSorter.setRowFilter(RowFilter.regexFilter("(?i)" + searchText));
-        }
-        clearInputFields();
-    }
-
-    private void displaySelectedRowData() {
+    private void displaySelectedRowData() {//DISPLAY THE INSERTED VALUES TO THE TEXT FEILD FORM THE TSELECTED ROW
         int selectedValue = table.getSelectedRow();
         id.setText((String) model.getValueAt(selectedValue, 0));
         Name.setText((String) model.getValueAt(selectedValue, 1));
@@ -271,27 +252,22 @@ public class MainFrame extends JFrame {
             model.setValueAt(Year.getSelectedItem(), selectedRow, 3);
 
             JOptionPane.showMessageDialog(null, "Changes Saved Successfully.");
-
-            // Update the corresponding row in the database
-     
-
         } else {
             JOptionPane.showMessageDialog(null, "Please Select a Row to Edit.");
         }
     }
 
     private void deleteSelectedAccount() {
-        int selectedRow = table.getSelectedRow();
-        if (selectedRow >= 0) {
-            model.removeRow(selectedRow);
-            JOptionPane.showMessageDialog(null, "Student Account is Successfully Deleted.");
+    	 int selectedRow = table.getSelectedRow();
+    	    if (selectedRow >= 0) {
+    	        model.removeRow(selectedRow);
+    	        JOptionPane.showMessageDialog(null, "Student Account is Successfully Deleted.");
 
-            // Delete the corresponding record from the database
-            deleteStudent((String) model.getValueAt(selectedRow, 0));
-
-        } else {
-            JOptionPane.showMessageDialog(null, "Please Select a Row to Delete.");
-        }
+    	  
+    	        deleteStudent((String) model.getValueAt(selectedRow, 0));
+    	    } else {
+    	        JOptionPane.showMessageDialog(null, "Please Select a Row to Delete.");
+    	    }
     }
 
     private void clearInputFields() {
@@ -301,13 +277,13 @@ public class MainFrame extends JFrame {
         Year.setSelectedItem("First Year");
     }
 
-    private void connectToDatabase() {
+    private void connectToDatabase() {//CONNECTION TO DATABASE AND WARNINGS
         try {
-            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);//PALITAN YUNG VALUES 'localhost...'root'1234' SA TAAS 
             System.out.println("Connected to the database.");
         } catch (SQLException e) {
             System.err.println("Error connecting to the database: " + e.getMessage());
-            e.printStackTrace(); // Print the stack trace for more details
+            e.printStackTrace(); 
         }
     }
 
@@ -315,47 +291,47 @@ public class MainFrame extends JFrame {
         model.addRow(new Object[]{id, name, course, year});
     }
 
-    private void insertStudent(String name, String id, String course, String year) {
+    private void insertStudent(String name, String id, String course, String year) {//METHOD INSERTING ADDED VALUES TO THE DATABASE
         try {
-            String query = "INSERT INTO your_table_name (Name, ID, Course, Year) VALUES (?, ?, ?, ?)";
+            String query = "INSERT INTO connector (StudentID, Name, Course, Year) VALUES (?, ?, ?, ?)";//SQL CODE
             try (PreparedStatement statement = connection.prepareStatement(query)) {
-                statement.setString(1, name);
-                statement.setString(2, id);
+                statement.setString(1, id);
+                statement.setString(2, name);
                 statement.setString(3, course);
                 statement.setString(4, year);
                 statement.executeUpdate();
             }
 
-            // Refresh the table after insertion
+       
             updateTable();
 
         } catch (SQLException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Failed to insert student record.");
+            JOptionPane.showMessageDialog(this, "Failed to insert student record. Check any DUPLICATION.");
         }
     }
 
     private void deleteStudent(String id) {
-        try {
-            String query = "DELETE FROM your_table_name WHERE ID=?";
-            try (PreparedStatement statement = connection.prepareStatement(query)) {
-                statement.setString(1, id);
-                statement.executeUpdate();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Failed to delete student record.");
-        }
+    	  try {
+    	        String query = "DELETE FROM connector WHERE StudentID=?";
+    	        try (PreparedStatement statement = connection.prepareStatement(query)) {
+    	            statement.setString(1, id); // Corrected index
+    	            statement.executeUpdate();
+    	        }
+    	    } catch (SQLException e) {
+    	        e.printStackTrace();
+    	        JOptionPane.showMessageDialog(this, "Failed to delete student record.");
+    	    }
     }
 
     private void updateTable() {
-        model.setRowCount(0); // Clear the existing table data
+        model.setRowCount(0); 
         try {
-            String query = "SELECT * FROM your_table_name";
+            String query = "SELECT * FROM connector";
             try (PreparedStatement statement = connection.prepareStatement(query)) {
-                ResultSet resultSet = statement.executeQuery(); // Execute the prepared statement
+                ResultSet resultSet = statement.executeQuery();
                 while (resultSet.next()) {
-                    String id = resultSet.getString("ID");
+                    String id = resultSet.getString("StudentID");
                     String name = resultSet.getString("Name");
                     String course = resultSet.getString("Course");
                     String year = resultSet.getString("Year");
