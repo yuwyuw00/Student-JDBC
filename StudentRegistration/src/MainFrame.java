@@ -182,6 +182,7 @@ public class MainFrame extends JFrame {
         lblName = new JLabel("Student's Name");
         lblCourseYear = new JLabel("Course & Year");
         lblIdNumber = new JLabel("StudentID Number");
+        lblIdNumber.setHorizontalAlignment(SwingConstants.RIGHT);
         Name = new JTextField();
         Name.setColumns(10);
         Course = new JTextField();
@@ -194,7 +195,7 @@ public class MainFrame extends JFrame {
         addAccPanel.add(lblName);
         lblCourseYear.setBounds(73, 113, 95, 35);
         addAccPanel.add(lblCourseYear);
-        lblIdNumber.setBounds(73, 67, 95, 35);
+        lblIdNumber.setBounds(42, 67, 117, 35);
         addAccPanel.add(lblIdNumber);
         Name.setBounds(169, 21, 537, 35);
         addAccPanel.add(Name);
@@ -225,19 +226,33 @@ public class MainFrame extends JFrame {
         if (Name.getText().equals("") || id.getText().equals("") || Course.getText().equals("")) {
             JOptionPane.showMessageDialog(null, "Please Insert Complete Information!");
         } else {
-            model.addRow(new Object[]{
-                    id.getText(),
-                    Name.getText(),
-                    Course.getText(),
-                    Year.getSelectedItem()
-            });
+            String studentID = id.getText();
+            if (isIDExists(studentID)) {
+                JOptionPane.showMessageDialog(null, "Student with ID " + studentID + " already exists!");
+            } else {
+                model.addRow(new Object[]{
+                        studentID,
+                        Name.getText(),
+                        Course.getText(),
+                        Year.getSelectedItem()
+                });
 
-            JOptionPane.showMessageDialog(null, "Student Account is Succesfully Added.");
+                JOptionPane.showMessageDialog(null, "Student Account is Succesfully Added.");
 
-            insertStudent(Name.getText(), id.getText(), Course.getText(), (String) Year.getSelectedItem());
+                insertStudent(Name.getText(), studentID, Course.getText(), (String) Year.getSelectedItem());
 
-            clearInputFields();
+                clearInputFields();
+            }
         }
+    }
+
+    private boolean isIDExists(String studentID) {
+        for (int i = 0; i < model.getRowCount(); i++) {
+            if (model.getValueAt(i, 0).equals(studentID)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void saveChanges() {
@@ -255,17 +270,18 @@ public class MainFrame extends JFrame {
     }
 
     private void deleteSelectedAccount() {
-    	 int selectedRow = table.getSelectedRow();
-    	    if (selectedRow >= 0) {
-    	        model.removeRow(selectedRow);
-    	        JOptionPane.showMessageDialog(null, "Student Account is Successfully Deleted.");
+        int selectedRow = table.getSelectedRow();
+        if (selectedRow >= 0) {
+            String studentID = (String) model.getValueAt(selectedRow, 0); // Get the StudentID from the selected row
+            model.removeRow(selectedRow);
+            JOptionPane.showMessageDialog(null, "Student Account is Successfully Deleted.");
 
-    	  
-    	        deleteStudent((String) model.getValueAt(selectedRow, 0));
-    	    } else {
-    	        JOptionPane.showMessageDialog(null, "Please Select a Row to Delete.");
-    	    }
+            deleteStudent(studentID); // Delete the corresponding record from the database using the StudentID
+        } else {
+            JOptionPane.showMessageDialog(null, "Please Select a Row to Delete.");
+        }
     }
+
 
     private void clearInputFields() {
         Name.setText("");
@@ -288,9 +304,9 @@ public class MainFrame extends JFrame {
         model.addRow(new Object[]{id, name, course, year});
     }
 
-    private void insertStudent(String name, String id, String course, String year) {//METHOD INSERTING ADDED VALUES TO THE DATABASE
+    private void insertStudent(String name, String id, String course, String year) {
         try {
-            String query = "INSERT INTO connector (StudentID, Name, Course, Year) VALUES (?, ?, ?, ?)";//SQL CODE
+            String query = "INSERT INTO connector (StudentID, Name, Course, Year) VALUES (?, ?, ?, ?)";
             try (PreparedStatement statement = connection.prepareStatement(query)) {
                 statement.setString(1, id);
                 statement.setString(2, name);
@@ -299,30 +315,34 @@ public class MainFrame extends JFrame {
                 statement.executeUpdate();
             }
 
-       
+            // Refresh the table after insertion
             updateTable();
 
         } catch (SQLException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Failed to insert student record. Check any DUPLICATION.");
+            JOptionPane.showMessageDialog(this, "Failed to insert student record.");
         }
     }
 
     private void deleteStudent(String id) {
-    	  try {
-    	        String query = "DELETE FROM connector WHERE StudentID=?";
-    	        try (PreparedStatement statement = connection.prepareStatement(query)) {
-    	            statement.setString(1, id); // Corrected index
-    	            statement.executeUpdate();
-    	        }
-    	    } catch (SQLException e) {
-    	        e.printStackTrace();
-    	        JOptionPane.showMessageDialog(this, "Failed to delete student record.");
-    	    }
+        try {
+            String query = "DELETE FROM connector WHERE StudentID=?";
+            try (PreparedStatement statement = connection.prepareStatement(query)) {
+                statement.setString(1, id);
+                statement.executeUpdate();
+            }
+
+            // Refresh the table after deletion
+            updateTable();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Failed to delete student record.");
+        }
     }
 
     private void updateTable() {
-        model.setRowCount(0); 
+        model.setRowCount(0); // Clear the existing table data
         try {
             String query = "SELECT * FROM connector";
             try (PreparedStatement statement = connection.prepareStatement(query)) {
